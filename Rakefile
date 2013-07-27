@@ -37,7 +37,16 @@ task :default, :source_file, :report_file do |_, args|
   Rake::Task[:generate].invoke(*args)
 end
 
+desc "Generate report according to yaml file"
 task :generate, :source_file, :report_file do |_, args|
   args.with_defaults source_file: 'test.yml', report_file: 'report.csv'
   Processor.new args.source_file, args.report_file
+end
+
+desc "Create a new yaml file"
+task :new, :file_name do |_, args|
+  args.with_defaults file_name: "#{Date.today}.yml"
+  
+  sh "touch #{args.file_name}"
+  sh "mate #{args.file_name}"
 end
