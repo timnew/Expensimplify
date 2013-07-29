@@ -1,6 +1,39 @@
-Taxi:
-  - 7, 25 4 5
-  - 8, 33 3 4
-  - 6/7, 22
-  
-  
+Taxi: # Texi Record
+  - 2013/7/1, 13 # Each record contains date and amount, separated by ",".
+  - 7/2, 13 # For date, for the records of this year, it is okay to omit the year. So suppose today is 2013/7/7, then 7/2 is parsed as 2013/7/2
+  - 3, 13 # For date, for the records of this month, it is okay to omit both the year and month. So suppose today is 2013/7/7, 3 is parsed as 2013/7/3
+  - 4, 12 3 16 # For amount, if you have multiple invoices for same entry, you can enter all the numbers separated by " ". The generator will calculate the sum for you.
+
+PerDiem: # Per Diem
+  from: 1 # The start date of the Per Diem, same date format used in Taxi
+  to: 7  # The end date of the Per Diem, same date format used in Taxi
+  # For the weekends in the provided date range, there is an extra entry generated for it because of the extra per diem for weekend.
+
+# If the date range of Per Diem is not continuing, you can provide the multiple sectioned per diem as following
+#PerDiem: # Multiple Sectioned Per Diem
+#  -
+#    from: 1
+#    to: 5
+#  -
+#    from: 8
+#    to: 14
+
+Chutian Hotel: # If is okay to provide customized entries, you can enter in the following format
+  - 2013/7/10, 390
+
+# This is the generated report
+#"timestamp","merchant","amount"
+#"2013-07-01","Taxi","13.0"
+#"2013-07-02","Taxi","13.0"
+#"2013-07-03","Taxi","13.0"
+#"2013-07-04","Taxi","31.0"
+#"2013-07-01","Travel Payment","150"
+#"2013-07-02","Travel Payment","150"
+#"2013-07-03","Travel Payment","150"
+#"2013-07-04","Travel Payment","150"
+#"2013-07-05","Travel Payment","150"
+#"2013-07-06","Travel Payment","150"
+#"2013-07-06","Travel Weekend Payment","200"
+#"2013-07-07","Travel Payment","150"
+#"2013-07-07","Travel Weekend Payment","200"
+#"2013-07-10","Chutian Hotel","390.0"

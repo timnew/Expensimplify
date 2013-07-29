@@ -102,7 +102,7 @@ end
 
 desc 'Generate report according to yaml file'
 task :generate, :source_file, :report_file do |_, args|
-  args.with_defaults source_file: 'test.yml', report_file: 'report.csv'
+  args.with_defaults source_file: 'sample.yml', report_file: 'report.csv'
   puts "Processing #{args.source_file}..."
   Processor.new args.source_file, args.report_file
   sh "less #{args.report_file}"
