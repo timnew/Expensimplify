@@ -22,7 +22,7 @@ class Hash
   end
 end
 
-class Processor
+class Expensimplify
   def initialize(input_file, report_file)
     input = YAML.load_file input_file
     @csv = CSV.open report_file, 'wb', quote_char: '"', force_quotes: true
@@ -104,7 +104,7 @@ desc 'Generate report according to yaml file'
 task :generate, :source_file, :report_file do |_, args|
   args.with_defaults source_file: 'sample.yml', report_file: 'report.csv'
   puts "Processing #{args.source_file}..."
-  Processor.new args.source_file, args.report_file
+  Expensimplify.new args.source_file, args.report_file
   sh "less #{args.report_file}"
   puts "Report: #{args.report_file}"
 end
