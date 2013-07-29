@@ -1,4 +1,4 @@
-Taxi: # Texi Record
+Taxi: # Taxi Record
   - 2013/7/1, 13 # Each record contains date and amount, separated by ",".
   - 7/2, 13 # For date, for the records of this year, it is okay to omit the year. So suppose today is 2013/7/7, then 7/2 is parsed as 2013/7/2
   - 3, 13 # For date, for the records of this month, it is okay to omit both the year and month. So suppose today is 2013/7/7, 3 is parsed as 2013/7/3
