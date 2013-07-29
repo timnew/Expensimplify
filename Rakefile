@@ -1,6 +1,5 @@
 require 'yaml'
 require 'csv'
-require 'pry'
 
 class String
   def underscore
@@ -8,7 +7,7 @@ class String
     word.gsub!(/::/, '/')
     word.gsub!(/([A-Z\d]+)([A-Z][a-z])/, '\1_\2')
     word.gsub!(/([a-z\d])([A-Z])/, '\1_\2')
-    word.tr!("-", "_")
+    word.tr!('-', '_')
     word.downcase!
     word
   end
@@ -98,11 +97,11 @@ class Processor
 end
 
 task :default, :source_file, :report_file do |_, args|
-  Rake::Task[:general_generate].invoke(*args)
+  Rake::Task[:generate].invoke(*args)
 end
 
-desc "Generate report according to yaml file"
-task :general_generate, :source_file, :report_file do |_, args|
+desc 'Generate report according to yaml file'
+task :generate, :source_file, :report_file do |_, args|
   args.with_defaults source_file: 'test.yml', report_file: 'report.csv'
   puts "Processing #{args.source_file}..."
   Processor.new args.source_file, args.report_file
@@ -110,10 +109,10 @@ task :general_generate, :source_file, :report_file do |_, args|
   puts "Report: #{args.report_file}"
 end
 
-desc "Create a new yaml file"
+desc 'Create a new yaml file and then generate a report from it'
 task :new, :file_name do |_, args|
   args.with_defaults file_name: "#{Date.today}.yml"
   sh "touch #{args.file_name}"
   sh "mate #{args.file_name}"
-  Rake::Task[:general_generate].invoke(args.file_name)
+  Rake::Task[:generate].invoke(args.file_name)
 end
