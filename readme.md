@@ -12,7 +12,6 @@ But what if Expensify doesn't suport your bank, or you are running out of the Sm
 
 Then you can use Expensimplify to generate the report.
 
-
 Genearte Report
 ----------------
 Expensify is developed on Ruby and Rake.
