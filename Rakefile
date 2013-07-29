@@ -98,6 +98,7 @@ task :general_generate, :source_file, :report_file do |_, args|
   args.with_defaults source_file: 'test.yml', report_file: 'report.csv'
   puts "Processing #{args.source_file}..."
   Processor.new args.source_file, args.report_file
+  sh "less #{args.report_file}"
   puts "Report: #{args.report_file}"
 end
 
