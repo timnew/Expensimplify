@@ -1,5 +1,6 @@
 require 'yaml'
 require 'csv'
+require 'pry'
 
 class String
   def underscore
@@ -54,21 +55,19 @@ class Processor
     amount.split(' ').map { |i| i.to_f }.reduce(:+).to_s
   end
 
+  DATE_DAY_REGEXP = /^[[:blank:]]*\d+[[:blank:]]*$/
+  DATE_MONTH_DAY_REGEXP = /^[[:blank:]]*(\d+)[[:blank:]]*[\/-][[:blank:]]*(\d+)[[:blank:]]*$/
+
   def parse_date(date)
-    case date
-      when Fixnum
-        Date.new(Date.today.year, Date.today.month, date)
-      when String
-        if date =~ /\d+/
-          Date.new(Date.today.year, Date.today.month, date.to_i)
-        elsif date =~ /\d+[\/-]\d+/
-          date, month, day = /(\d)+[\/-](\d)/.match date
-          Date.new(Date.today.year, month, day)
-        else
-          Date.parse(date)
-        end
-      else
-        nil
+    date = date.to_s
+
+    if date =~ DATE_DAY_REGEXP
+      Date.new(Date.today.year, Date.today.month, date.to_i)
+    elsif match_date = DATE_MONTH_DAY_REGEXP.match(date)
+      month, day = match_date.captures
+      Date.new(Date.today.year, month.to_i, day.to_i)
+    else
+      Date.parse(date)
     end
   end
 
@@ -87,6 +86,7 @@ class Processor
       @csv << [date.to_s, :'Travel Weekend Payment', 200.to_s] if date.saturday? || date.sunday?
     end
   end
+
 end
 
 task :default, :source_file, :report_file do |_, args|
