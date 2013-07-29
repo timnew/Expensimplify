@@ -76,17 +76,25 @@ class Processor
   end
 
   def per_diem(content)
-    content.symbolize_keys!
+    case content
+      when Array
+        content.each { |section| per_diem(section) }
+      when Hash
+        content.symbolize_keys!
 
-    from_date = parse_date content[:from]
-    to_date = parse_date content[:to]
+        from_date = parse_date content[:from]
+        to_date = parse_date content[:to]
 
-    (from_date..to_date).each do |date|
-      @csv << [date.to_s, :'Travel Payment', 150.to_s]
-      @csv << [date.to_s, :'Travel Weekend Payment', 200.to_s] if date.saturday? || date.sunday?
+        (from_date..to_date).each do |date|
+          write_per_diem(date)
+        end
     end
   end
 
+  def write_per_diem(date)
+    @csv << [date.to_s, :'Travel Payment', 150.to_s]
+    @csv << [date.to_s, :'Travel Weekend Payment', 200.to_s] if date.saturday? || date.sunday?
+  end
 end
 
 task :default, :source_file, :report_file do |_, args|
