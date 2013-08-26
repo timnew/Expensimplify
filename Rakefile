@@ -117,21 +117,42 @@ task :default, :source_file, :report_file do |_, args|
   Rake::Task[:generate].invoke(*args)
 end
 
+def normalize_filename(input, ext, default)
+  file_name = if input.nil?
+                ''
+              else
+                input.strip
+              end
+
+  file_name = "#{default}" if file_name == ''
+
+  file_name = "#{file_name}#{ext}" if File.extname(file_name) == ''
+
+  file_name
+end
+
 desc 'Generate report according to yaml file'
 task :generate, :source_file, :report_file do |_, args|
-  args.with_defaults source_file: "#{Date.today}.yml", report_file: 'report.csv'
-  puts "Processing #{args.source_file}..."
-  Expensimplify.new args.source_file, args.report_file
-  sh "less #{args.report_file}"
-  puts "Report: #{args.report_file}"
+  source_file = normalize_filename args.ource_file, '.yml', Date.today
+  report_file = normalize_filename args.report_file, '.csv', 'report'
+
+  puts "Processing #{source_file}..."
+
+  Expensimplify.new source_file, report_file
+
+  sh "less #{report_file}"
+  puts "Report: #{report_file}"
 end
 
 desc 'Create a new yaml file and then generate a report from it'
 task :new, :file_name do |_, args|
-  args.with_defaults file_name: "#{Date.today}.yml"
-  create_file args.file_name
-  sh "subl -w #{args.file_name}"
-  Rake::Task[:generate].invoke(args.file_name)
+  file_name = normalize_filename args.file_name, '.yml', Date.today
+
+  create_file file_name
+
+  sh "subl -w #{file_name}"
+
+  Rake::Task[:generate].invoke(file_name)
 end
 
 def create_file(file_name)
@@ -139,20 +160,21 @@ def create_file(file_name)
 
   File.open file_name, 'w' do |file|
     file << <<-END
-      # Expensimplify Data Sheet
-      Today: #{Date.today}
-      # Taxi:
-      #   - <date>, <amount list>
-      # PerDiem:
-      #   from: <start date>
-      #   to: <end date>
-      # PerDiem:
-      #  -
-      #    from: <start date 1>
-      #    to: <end date 2>
-      #  -
-      #    from: <start date 2>
-      #    to: <end date 2>
+# Expensimplify Data Sheet
+# Taxi:
+#   - <date>, <amount list>
+# PerDiem:
+#   from: <start date>
+#   to: <end date>
+# PerDiem:
+#  -
+#    from: <start date 1>
+#    to: <end date 2>
+#  -
+#    from: <start date 2>
+#    to: <end date 2>
+
+Today: #{Date.today}
     END
   end
 end
