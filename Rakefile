@@ -28,6 +28,8 @@ class Expensimplify
     @csv = CSV.open report_file, 'wb', quote_char: '"', force_quotes: true
     @csv << %w(timestamp merchant amount)
 
+    @reference_date = Date.today
+
     input.each do |type, content|
       method_name = type.underscore
       if self.class.method_defined?(method_name)
@@ -39,6 +41,21 @@ class Expensimplify
 
     @csv.close
   end
+
+  def today(content)
+    @reference_date = case content
+                        when String
+                          Date.parse content
+                        when Date
+                          content
+                        when :today
+                          Date.today
+                        else
+                          raise "Invalid reference date #{content}"
+                      end
+  end
+
+  alias_method :reference_date, :today
 
   def general_generate(type, rows)
     rows.map { |row| row.split(',') }.each do |date, amount|
@@ -61,10 +78,10 @@ class Expensimplify
     date = date.to_s
 
     if date =~ DATE_DAY_REGEXP
-      Date.new(Date.today.year, Date.today.month, date.to_i)
+      Date.new(@reference_date.year, @reference_date.month, date.to_i)
     elsif match_date = DATE_MONTH_DAY_REGEXP.match(date)
       month, day = match_date.captures
-      Date.new(Date.today.year, month.to_i, day.to_i)
+      Date.new(@reference_date.year, month.to_i, day.to_i)
     else
       Date.parse(date)
     end
@@ -102,7 +119,7 @@ end
 
 desc 'Generate report according to yaml file'
 task :generate, :source_file, :report_file do |_, args|
-  args.with_defaults source_file: 'sample.yml', report_file: 'report.csv'
+  args.with_defaults source_file: "#{Date.today}.yml", report_file: 'report.csv'
   puts "Processing #{args.source_file}..."
   Expensimplify.new args.source_file, args.report_file
   sh "less #{args.report_file}"
@@ -112,7 +129,30 @@ end
 desc 'Create a new yaml file and then generate a report from it'
 task :new, :file_name do |_, args|
   args.with_defaults file_name: "#{Date.today}.yml"
-  sh "touch #{args.file_name}"
-  sh "mate #{args.file_name}"
+  create_file args.file_name
+  sh "subl -w #{args.file_name}"
   Rake::Task[:generate].invoke(args.file_name)
+end
+
+def create_file(file_name)
+  return if File.exists? file_name
+
+  File.open file_name, 'w' do |file|
+    file << <<-END
+      # Expensimplify Data Sheet
+      Today: #{Date.today}
+      # Taxi:
+      #   - <date>, <amount list>
+      # PerDiem:
+      #   from: <start date>
+      #   to: <end date>
+      # PerDiem:
+      #  -
+      #    from: <start date 1>
+      #    to: <end date 2>
+      #  -
+      #    from: <start date 2>
+      #    to: <end date 2>
+    END
+  end
 end
