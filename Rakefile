@@ -123,7 +123,7 @@ def normalize_filename(input, ext, default)
               else
                 input.strip
               end
-
+  
   file_name = "#{default}" if file_name == ''
 
   file_name = "#{file_name}#{ext}" if File.extname(file_name) == ''
@@ -133,7 +133,7 @@ end
 
 desc 'Generate report according to yaml file'
 task :generate, :source_file, :report_file do |_, args|
-  source_file = normalize_filename args.ource_file, '.yml', Date.today
+  source_file = normalize_filename args.source_file, '.yml', Date.today
   report_file = normalize_filename args.report_file, '.csv', 'report'
 
   puts "Processing #{source_file}..."
